@@ -1,26 +1,10 @@
-import java.awt.Color;
-import java.awt.Dimension;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.zip.GZIPOutputStream;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-
-import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.PumpStreamHandler;
 
 
 public class WordAlignMain {
@@ -31,8 +15,13 @@ public class WordAlignMain {
 	
 	
 	public static String[] files = {
-			"AlbanianTosk"
-			
+//			"AlbanianTosk",
+//			"ArmenianEastern",
+//			"ArmenianWestern"
+//			"Portuguese",
+//			"Spanish"
+			"Latin",
+			"Lithuanian"
 	}; 
 	
 	public static void main (String[] args) throws IOException
@@ -51,7 +40,7 @@ public class WordAlignMain {
 			
 		if(files.length == 1){
 			
-			String wordListFile = "Indo-European.list";
+			String wordListFile = "Indo-European_new.list";
 			String losFile = "Indo-European.los";
 			
 			String relevantWordsFile = files[0] + ".list";
@@ -97,13 +86,13 @@ public class WordAlignMain {
 			try{
 				
 				PrintWriter cmdWriter = new PrintWriter(cmdFileName, "UTF-8");
-				String outString = "cat " + relevantWordsFile + " | ./WordAlign twoway "
+				String outString = "cat " + relevantWordsFile + " | ./WordAlign-2016-03-07 twoway "
 						+ "--scorefile " + relevantLOSFile + " --bigramdef=-3.5 --gapopen=-4 --gapextend=-1 "
 								+ "| gzip >" + files[0] + ".aln.gz";
 				
 				cmdWriter.println(outString);
-				cmdWriter.println("rm " + relevantWordsFile);
-				cmdWriter.println("rm " + relevantLOSFile);
+//				cmdWriter.println("rm " + relevantWordsFile);
+//				cmdWriter.println("rm " + relevantLOSFile);
 				
 				cmdWriter.close();
 				
@@ -131,12 +120,12 @@ public class WordAlignMain {
 			Collections.sort(languages);
 			
 			
-			String wordListFile = "Indo-European.list";
+			String wordListFile = "Indo-European_new.list";
 			String losFile = "Indo-European.los";
 			
 			for(int i = 0; i < languages.size() -1; i++){
 				
-				for(int j = 0; j < languages.size(); j++){
+				for(int j = i + 1; j < languages.size(); j++){
 					
 					String relevantWordsFile = languages.get(i) + "_" + languages.get(j) + ".list";
 					String relevantLOSFile = languages.get(i) + "_" + languages.get(j) + ".los";
@@ -180,9 +169,9 @@ public class WordAlignMain {
 					try{
 						
 						PrintWriter cmdWriter = new PrintWriter(cmdFileName, "UTF-8");
-						String outString = "cat " + relevantWordsFile + " | ./WordAlign twoway "
-								+ "--scorefile " + relevantLOSFile + " --bigramdef=-3.5 --gapopen=-4 --gapextend=-1 "
-										+ "| gzip >" + languages.get(i) + "_" + languages.get(j) + ".aln.gz";
+						String outString = "cat " + relevantWordsFile + " | ./WordAlign-2016-03-07 twoway "
+								+ " -n --scorefile " + relevantLOSFile + " --bigramdef=-3.5 --gapopen=-4"
+										+ " --lpblock=1,2 | gzip >" + languages.get(i) + "_" + languages.get(j) + ".aln.gz";
 						
 						cmdWriter.println(outString);
 						cmdWriter.println("rm " + relevantWordsFile);
@@ -191,7 +180,7 @@ public class WordAlignMain {
 						cmdWriter.close();
 						
 						System.out.println("Starting pairwise alignment of " + languages.get(i) + " and " +
-								languages.get(j) + "\\.\\.\\.");
+								languages.get(j) + "...");
 						
 						Process p =Runtime.getRuntime().exec("/bin/sh aln_commandlines.sh");
 						p.waitFor();
